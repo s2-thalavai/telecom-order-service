@@ -1,0 +1,42 @@
+### Telecom order API – IntelliJ HTTP Client / VS Code REST Client
+### Email triggers: slow, down, risky, provfail, manual
+@api = http://localhost:8080/api/v1
+
+### Place an order (CompletableFuture workflow) -> 201 PROVISIONING
+POST {{api}}/orders
+Content-Type: application/json
+
+{"customerName":"Anita Rao","email":"anita@example.com","planCode":"UNL-599","circle":"KA"}
+
+### Long-poll until final (DeferredResult): 200 when ACTIVE/FAILED/REJECTED, 202 when the wait expires
+GET {{api}}/orders/REPLACE_WITH_ID/await?timeoutSeconds=20
+
+### Order without automatic callback (complete it with the webhook below)
+POST {{api}}/orders
+Content-Type: application/json
+
+{"customerName":"Manual","email":"manual@example.com","planCode":"DATA-299","circle":"TN"}
+
+### Provisioning webhook (applied=false for duplicates / late callbacks)
+POST {{api}}/provisioning/callbacks
+Content-Type: application/json
+
+{"orderId":"REPLACE_WITH_ID","success":true,"iccid":"8991000000000000001","message":"activated"}
+
+### Failure modes
+POST {{api}}/orders
+Content-Type: application/json
+
+{"customerName":"Slow","email":"slow@example.com","planCode":"UNL-599","circle":"KA"}
+
+### Cached plan lookup (second call is instant)
+GET {{api}}/plans/FAM-999
+
+### Parallel bulk portability check
+POST {{api}}/portability/bulk-check
+Content-Type: application/json
+
+["9876543210","9876543211","9000000001","9001000001"]
+
+### Orders by status
+GET {{api}}/orders?status=ACTIVE&size=10

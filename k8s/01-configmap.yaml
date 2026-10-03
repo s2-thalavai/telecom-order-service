@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: orders-config
+  namespace: telecom-orders
+data:
+  SPRING_PROFILES_ACTIVE: "prod"
+  DB_HOST: "mysql"
+  DB_PORT: "3306"
+  DB_NAME: "orders"
+  # deadline budget: workflow (5s) < max long-poll (55s) < ingress read timeout (75s)
+  TELECOM_ORDERS_WORKFLOW_DEADLINE: "5s"
+  TELECOM_ORDERS_MAX_AWAIT: "55s"
+  SPRING_MVC_ASYNC_REQUEST_TIMEOUT: "30s"
+  JAVA_OPTS: "-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError -Duser.timezone=UTC"
